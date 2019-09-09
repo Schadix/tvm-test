@@ -190,7 +190,7 @@ def get_network(name, batch_size):
 target = tvm.target.create('llvm -device=arm_cpu -target=aarch64-linux-gnu')
 
 # Also replace this with the device key in your tracker
-device_key = 'rk3399'
+device_key = 'nano'
 
 # Set this to True if you use android phone
 use_android = False
@@ -211,7 +211,7 @@ tuning_option = {
         builder=autotvm.LocalBuilder(
             build_func='ndk' if use_android else 'default'),
         runner=autotvm.RPCRunner(
-            device_key, host='0.0.0.0', port=9190,
+            device_key, host='0.0.0.0', port=8192,
             number=5,
             timeout=10,
         ),
@@ -345,7 +345,7 @@ def tune_and_evaluate(tuning_opt):
 
         # upload module to device
         print("Upload...")
-        remote = autotvm.measure.request_remote(device_key, '0.0.0.0', 9190,
+        remote = autotvm.measure.request_remote(device_key, '0.0.0.0', 8192,
                                                 timeout=10000)
         remote.upload(tmp.relpath(filename))
         rlib = remote.load_module(filename)

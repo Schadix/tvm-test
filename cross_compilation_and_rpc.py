@@ -110,12 +110,12 @@ s = tvm.create_schedule(B.op)
 # Raspberry Pi 3B, but we use 'llvm' here to make this tutorial runnable
 # on our webpage building server. See the detailed note in the following block.
 
-local_demo = True
+local_demo = False
 
 if local_demo:
     target = 'llvm'
 else:
-    target = 'llvm -target=armv7l-linux-gnueabihf'
+    target = 'llvm -target=aarch64-linux-gnu'
 
 func = tvm.build(s, [A, B], target=target, name='add_one')
 # save the lib at a local temp folder
@@ -167,7 +167,7 @@ if local_demo:
     remote = rpc.LocalSession()
 else:
     # The following is my environment, change this to the IP address of your target device
-    host = '10.77.1.162'
+    host = '192.168.7.63'
     port = 9090
     remote = rpc.connect(host, port)
 

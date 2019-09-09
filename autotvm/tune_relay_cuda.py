@@ -117,6 +117,7 @@ target = tvm.target.cuda()
 network = 'resnet-18'
 log_file = "%s.log" % network
 dtype = 'float32'
+device_key = 'nano'
 
 tuning_option = {
     'log_filename': log_file,
@@ -129,8 +130,8 @@ tuning_option = {
         builder=autotvm.LocalBuilder(timeout=10),
         #runner=autotvm.LocalRunner(number=20, repeat=3, timeout=4, min_repeat_ms=150),
         runner=autotvm.RPCRunner(
-            '1080ti',  # change the device key to your key
-            '0.0.0.0', 9190,
+            device_key,  # change the device key to your key
+            '0.0.0.0', 8192,
             number=20, repeat=3, timeout=4, min_repeat_ms=150)
     ),
 }
@@ -329,13 +330,13 @@ def tune_and_evaluate(tuning_opt):
 #
 # .. code-block:: bash
 #
-#   python -m tvm.exec.rpc_tracker --host=0.0.0.0 --port=9190
+#   python -m tvm.exec.rpc_tracker --host=0.0.0.0 --port=8192
 #
 # The expected output is
 #
 # .. code-block:: bash
 #
-#   INFO:RPCTracker:bind to 0.0.0.0:9190
+#   INFO:RPCTracker:bind to 0.0.0.0:8192
 #
 # Then open another new terminal for the RPC server. We need to start one server
 # for each dedicated device. We use a string key to distinguish the types of devices.
@@ -345,13 +346,13 @@ def tune_and_evaluate(tuning_opt):
 #
 # .. code-block:: bash
 #
-#     python -m tvm.exec.rpc_server --tracker=0.0.0.0:9190 --key=1080ti
+#     python -m tvm.exec.rpc_server --tracker=0.0.0.0:8192 --key=1080ti
 #
 # After registering devices, we can confirm it by querying rpc_tracker
 #
 # .. code-block:: bash
 #
-#   python -m tvm.exec.query_rpc_tracker --host=0.0.0.0 --port=9190
+#   python -m tvm.exec.query_rpc_tracker --host=0.0.0.0 --port=8192
 #
 # For example, if we have four 1080ti, two titanx and one gfx900, the output can be
 #
@@ -369,6 +370,7 @@ def tune_and_evaluate(tuning_opt):
 # Finally, we need to change the tuning option to use RPCRunner. Use the code below
 # to replace the corresponding part above.
 
+
 tuning_option = {
     'log_filename': log_file,
 
@@ -379,8 +381,8 @@ tuning_option = {
     'measure_option': autotvm.measure_option(
         builder=autotvm.LocalBuilder(timeout=10),
         runner=autotvm.RPCRunner(
-            '1080ti',  # change the device key to your key
-            '0.0.0.0', 9190,
+            device_key,  # change the device key to your key
+            '0.0.0.0', 8192,
             number=20, repeat=3, timeout=4, min_repeat_ms=150),
     ),
 }
