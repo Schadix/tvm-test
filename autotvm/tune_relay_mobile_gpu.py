@@ -186,7 +186,7 @@ def get_network(name, batch_size):
 
 #### DEVICE CONFIG ####
 
-target = tvm.target.create('opencl -device=mali')
+target = tvm.target.cuda()
 
 # Replace "aarch64-linux-gnu" with the correct target of your board.
 # This target host is used for cross compilation. You can query it by :code:`gcc -v` on your device.
