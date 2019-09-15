@@ -193,7 +193,7 @@ target = tvm.target.cuda()
 target_host = 'llvm -target=aarch64-linux-gnu'
 
 # Also replace this with the device key in your tracker
-device_key = 'nano'
+device_key = 'tx2'
 
 # Set this to True if you use android phone
 use_android = False
@@ -207,7 +207,7 @@ tuning_option = {
     'log_filename': log_file,
 
     'tuner': 'xgb',
-    'n_trial': 1000,
+    'n_trial': 10,
     'early_stopping': 450,
 
     'measure_option': autotvm.measure_option(
@@ -215,7 +215,7 @@ tuning_option = {
             build_func='ndk' if use_android else 'default'),
         runner=autotvm.RPCRunner(
             device_key, host='0.0.0.0', port=8192,
-            number=10,
+            number=1,
             timeout=5,
         ),
     ),
@@ -244,7 +244,7 @@ tuning_option = {
 def tune_tasks(tasks,
                measure_option,
                tuner='xgb',
-               n_trial=1000,
+               n_trial=10,
                early_stopping=None,
                log_filename='tuning.log',
                use_transfer_learning=True,
