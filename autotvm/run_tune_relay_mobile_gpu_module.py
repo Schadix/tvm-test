@@ -17,13 +17,19 @@ def inference(module_path, json_path, params_path):
     ctx = tvm.gpu(0)
     batch_size = 1
     input_shape = (batch_size, 3, 224, 224)
+    output_shape = (batch_size, 1000)   
     dtype = 'float32'
 
     x = tvm.nd.array((np.random.uniform(size=input_shape)).astype(dtype))
+    o = tvm.nd.array(output_shape)
+
 
     module = graph_runtime.create(loaded_json, loaded_lib, ctx)
     module.load_params(loaded_params)
     module.run(data=x)
+    print("done")
+    for i in range(module.get_num_outputs()):
+        print(module.get_output(i))
 
 
 if __name__ == '__main__':
