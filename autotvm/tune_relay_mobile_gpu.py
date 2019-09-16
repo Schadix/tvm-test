@@ -202,6 +202,10 @@ use_android = False
 network = 'resnet-18'
 log_file = "%s.%s.log" % (device_key, network)
 dtype = 'float32'
+tracker_host = '0.0.0.0'
+tracker_port = 8192
+
+module_export_prefix = "{}-{}".format(network, device_key)
 
 tuning_option = {
     'log_filename': log_file,
@@ -214,7 +218,7 @@ tuning_option = {
         builder=autotvm.LocalBuilder(
             build_func='ndk' if use_android else 'default'),
         runner=autotvm.RPCRunner(
-            device_key, host='0.0.0.0', port=8192,
+            device_key, host=tracker_host, port=tracker_port,
             number=1,
             timeout=5,
         ),
@@ -321,15 +325,24 @@ def tune_and_evaluate(tuning_opt):
         tmp = tempdir()
         if use_android:
             from tvm.contrib import ndk
-            filename = "net.so"
+            filename = "{}.so".format(module_export_prefix)
             lib.export_library(tmp.relpath(filename), ndk.create_shared)
         else:
-            filename = "net.tar"
+            filename = "{}.tar".format(module_export_prefix)
             lib.export_library(tmp.relpath(filename))
+
+        lib.imported_modules[0].save("{}-cuda.ptx".format(module_export_prefix))
+        lib.export_library("{}-lib.tar".format(module_export_prefix))
+
+        with open("{}-graph.json".format(module_export_prefix), "w") as fo:
+            fo.write(graph)
+
+        with open("{}-params.params".format(module_export_prefix), "wb") as fo:
+            fo.write(relay.save_param_dict(params))
 
         # upload module to device
         print("Upload...")
-        remote = autotvm.measure.request_remote(device_key, '0.0.0.0', 8192,
+        remote = autotvm.measure.request_remote(device_key, tracker_host, tracker_port,
                                                 timeout=10000)
         remote.upload(tmp.relpath(filename))
         rlib = remote.load_module(filename)
