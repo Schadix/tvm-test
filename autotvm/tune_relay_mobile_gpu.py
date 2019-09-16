@@ -186,7 +186,10 @@ def get_network(name, batch_size):
 
 #### DEVICE CONFIG ####
 
-target = tvm.target.cuda()
+# TODO: add model to arch mapping
+target = tvm.target.cuda(model="tx2")
+from tvm.autotvm.measure.measure_methods import set_cuda_target_arch
+set_cuda_target_arch('sm_62')
 
 # Replace "aarch64-linux-gnu" with the correct target of your board.
 # This target host is used for cross compilation. You can query it by :code:`gcc -v` on your device.
