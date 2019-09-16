@@ -86,7 +86,10 @@ def get_network(name, params='retrain_yolo3_darknet_pig_best.params'):
     return mod, params, input_shape
 
 #### DEVICE CONFIG ####
-target = tvm.target.cuda()
+target = tvm.target.cuda(model="tx2")
+from tvm.autotvm.measure.measure_methods import set_cuda_target_arch
+set_cuda_target_arch('sm_62')
+
 target_host = 'llvm -target=aarch64-linux-gnu'
 
 #### TUNING OPTION ####
