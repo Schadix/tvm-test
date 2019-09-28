@@ -1,0 +1,4 @@
+gluoncv
+mxnet-cu100
+decorator
+psutil
